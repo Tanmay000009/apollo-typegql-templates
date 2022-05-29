@@ -1,23 +1,32 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
 import * as express from "express";
 import { ApolloServer } from "apollo-server-express";
 
-import { typeDefs } from "./typeDefs";
+// import { UserResolver } from "./resolvers/user.resolver";
+// import { buildSchema } from "type-graphql";
 import { resolvers } from "./resolvers";
+import { typeDefs } from "./typeDefs";
+const PORT = process.env.PORT || 4000;
 
-const startServer = async () => {
-  const server = new ApolloServer({ typeDefs, resolvers });
+const main = async () => {
+  try {
+    const app = express();
 
-  await createConnection();
+    // Create the GraphQL server
+    const apolloServer = new ApolloServer({
+      typeDefs,
+      resolvers,
+    });
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app });
 
-  const app = express();
-
-  server.applyMiddleware({ app });
-
-  app.listen({ port: 4000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-  );
+    // Start the server
+    app.listen(PORT, () =>
+      console.log(`Server started http://localhost:${PORT}/graphql`)
+    );
+  } catch (err) {
+    console.error(err);
+  }
 };
 
-startServer();
+main().catch((err) => console.log(err));
