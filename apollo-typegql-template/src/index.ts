@@ -6,10 +6,21 @@ import { ApolloServer } from "apollo-server-express";
 // import { buildSchema } from "type-graphql";
 import { resolvers } from "./resolvers";
 import { typeDefs } from "./typeDefs";
+import dataSource from "../app-data-source"
 const PORT = process.env.PORT || 4000;
 
 const main = async () => {
   try {
+
+    dataSource
+    .initialize()
+    .then(() => {
+      console.log("Data Source has been initialized!");
+    })
+    .catch((err) => {
+      console.error("Error during Data Source initialization:", err);
+    });
+
     const app = express();
 
     // Create the GraphQL server
